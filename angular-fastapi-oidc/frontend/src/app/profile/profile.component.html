@@ -1,0 +1,29 @@
+<div class="profile-container">
+  <h2>User Profile</h2>
+
+  <div class="section">
+    <h3>Authentication Information</h3>
+    <div *ngIf="userInfo">
+      <pre>{{ userInfo | json }}</pre>
+    </div>
+    <div *ngIf="!userInfo">
+      <p>No user information available</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Backend Data</h3>
+    <div *ngIf="backendData">
+      <pre>{{ backendData | json }}</pre>
+    </div>
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+    <button class="btn btn-secondary" (click)="loadBackendData()">Refresh Backend Data</button>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-danger" (click)="logout()">Logout</button>
+  </div>
+</div>
+

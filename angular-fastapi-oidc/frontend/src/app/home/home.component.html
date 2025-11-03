@@ -1,0 +1,19 @@
+<div class="home-container">
+  <h2>Welcome to the OAuth2/OIDC Demo</h2>
+  
+  <div *ngIf="authService.isAuthenticated(); else notAuthenticated">
+    <div class="alert alert-success">
+      <p>You are authenticated!</p>
+      <pre>{{ getClaims() | json }}</pre>
+    </div>
+    <button class="btn btn-danger" (click)="logout()">Logout</button>
+  </div>
+
+  <ng-template #notAuthenticated>
+    <div class="alert alert-info">
+      <p>Please login to access protected resources</p>
+    </div>
+    <button class="btn btn-primary" (click)="login()">Login</button>
+  </ng-template>
+</div>
+
