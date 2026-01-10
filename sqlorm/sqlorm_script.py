@@ -26,6 +26,10 @@ class Livre(SQLModel, table=True):
     # Relation many-to-many avec auteurs
     auteurs: List["Auteur"] = Relationship(back_populates="livres", link_model=LivreAuteur)
 
+    # Relation avec statut
+    status_id: Optional[int] = Field(default=None, sa_column=Column("t01_status_id", Integer, ForeignKey("t04_translation.t04_id")))
+    status: Optional["Translation"] = Relationship()
+
 # Modèle pour les auteurs
 class Auteur(SQLModel, table=True):
     __tablename__ = "t02_auteurs"
@@ -37,6 +41,17 @@ class Auteur(SQLModel, table=True):
 
     # Relation many-to-many avec livres
     livres: List[Livre] = Relationship(back_populates="auteurs", link_model=LivreAuteur)
+
+# Modèle pour les traductions
+class Translation(SQLModel, table=True):
+    __tablename__ = "t04_translation"
+
+    id: Optional[int] = Field(default=None, sa_column=Column("t04_id", Integer, primary_key=True))
+    code: str = Field(sa_column=Column("t04_code", String(50), nullable=False))
+    type: str = Field(sa_column=Column("t04_type", String(50), nullable=False))
+    default_translation: str = Field(sa_column=Column("t04_default_translation", String(255), nullable=False))
+    translation_en: str = Field(sa_column=Column("t04_translation_en", String(255), nullable=False))
+    translation_fr: str = Field(sa_column=Column("t04_translation_fr", String(255), nullable=False))
 
 # Fonctions CRUD pour les livres
 def create_livre(session: Session, titre: str, description: Optional[str] = None) -> Livre:
@@ -134,6 +149,45 @@ def remove_auteur_from_livre(session: Session, livre_id: int, auteur_id: int) ->
         return True
     return False
 
+# Fonctions CRUD pour les traductions
+def create_translation(session: Session, code: str, type: str, default_translation: str, translation_en: str, translation_fr: str) -> Translation:
+    translation = Translation(code=code, type=type, default_translation=default_translation, translation_en=translation_en, translation_fr=translation_fr)
+    session.add(translation)
+    session.commit()
+    session.refresh(translation)
+    return translation
+
+def read_translations(session: Session) -> List[Translation]:
+    return session.exec(select(Translation)).all()
+
+def read_translation_by_id(session: Session, translation_id: int) -> Optional[Translation]:
+    return session.exec(select(Translation).where(Translation.id == translation_id)).first()
+
+def update_translation(session: Session, translation_id: int, code: Optional[str] = None, type: Optional[str] = None, default_translation: Optional[str] = None, translation_en: Optional[str] = None, translation_fr: Optional[str] = None) -> Optional[Translation]:
+    translation = session.exec(select(Translation).where(Translation.id == translation_id)).first()
+    if translation:
+        if code:
+            translation.code = code
+        if type:
+            translation.type = type
+        if default_translation:
+            translation.default_translation = default_translation
+        if translation_en:
+            translation.translation_en = translation_en
+        if translation_fr:
+            translation.translation_fr = translation_fr
+        session.commit()
+        session.refresh(translation)
+    return translation
+
+def delete_translation(session: Session, translation_id: int) -> bool:
+    translation = session.exec(select(Translation).where(Translation.id == translation_id)).first()
+    if translation:
+        session.delete(translation)
+        session.commit()
+        return True
+    return False
+
 # Fonction pour créer les tables
 def create_tables():
     SQLModel.metadata.create_all(engine)
@@ -154,11 +208,22 @@ if __name__ == "__main__":
         auteur3 = create_auteur(session, "John", "Doe", "Unknown author.")
         auteur4 = create_auteur(session, "Jane", "Doe", "Also uknown author.")
 
+        # Créer des statuts
+        status_available = create_translation(session, "available", "status", "Available", "Available", "Disponible")
+        status_borrowed = create_translation(session, "borrowed", "status", "Borrowed", "Borrowed", "Emprunté")
+        status_acquiring = create_translation(session, "acquiring", "status", "Acquiring", "Acquiring", "En cours d'acquisition")
+
         # Créer des livres
         livre1 = create_livre(session, "Les Misérables", "Roman historique de Victor Hugo.")
         livre2 = create_livre(session, "L'Étranger", "Roman philosophique d'Albert Camus.")
         livre3 = create_livre(session, "Book 3", "New book 3.")
         livre4 = create_livre(session, "Book 4", "New book 4.")
+
+        # Assigner des statuts aux livres
+        livre1.status = status_available
+        livre2.status = status_borrowed
+        livre3.status = status_acquiring
+        livre4.status = status_available
 
         # Associer auteurs aux livres
         add_auteur_to_livre(session, livre1.id, auteur1.id)
@@ -170,7 +235,8 @@ if __name__ == "__main__":
         # Lire et afficher
         livres = read_livres(session)
         for livre in livres:
-            print(f"Livre: {livre.titre} - Auteurs: {[f'{a.prenom} {a.nom}' for a in livre.auteurs]}")
+            status_name = livre.status.translation_fr if livre.status else "Inconnu"
+            print(f"Livre: {livre.titre} - Statut: {status_name} - Auteurs: {[f'{a.prenom} {a.nom}' for a in livre.auteurs]}")
 
         auteurs = read_auteurs(session)
         for auteur in auteurs:
