@@ -2,3 +2,5 @@
 package-lock.json
 .vscode
 .idea
+*.db
+*.zip
