@@ -40,7 +40,7 @@ class Auteur(SQLModel, table=True):
 
 # Fonctions CRUD pour les livres
 def create_livre(session: Session, titre: str, description: Optional[str] = None) -> Livre:
-    livre = Livre(titre=titre, _description=description)
+    livre = Livre(titre=titre, description=description)
     session.add(livre)
     session.commit()
     session.refresh(livre)
