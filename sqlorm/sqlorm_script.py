@@ -1,11 +1,11 @@
-from sqlmodel import SQLModel, Field, Relationship, create_engine, Session
+from sqlmodel import SQLModel, Field, Relationship, create_engine, Session, select
 from typing import List, Optional
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.orm import relationship
 
 # Configuration de la base de données
 DATABASE_URL = "sqlite:///./test_database.db"
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=False)
 
 # Table d'association pour la relation many-to-many
 class LivreAuteur(SQLModel, table=True):
@@ -47,13 +47,13 @@ def create_livre(session: Session, titre: str, description: Optional[str] = None
     return livre
 
 def read_livres(session: Session) -> List[Livre]:
-    return session.query(Livre).all()
+    return session.exec(select(Livre)).all()
 
 def read_livre_by_id(session: Session, livre_id: int) -> Optional[Livre]:
-    return session.query(Livre).filter(Livre.id == livre_id).first()
+    return session.exec(select(Livre).where(Livre.id == livre_id)).first()
 
 def update_livre(session: Session, livre_id: int, titre: Optional[str] = None, description: Optional[str] = None) -> Optional[Livre]:
-    livre = session.query(Livre).filter(Livre.id == livre_id).first()
+    livre = session.exec(select(Livre).where(Livre.id == livre_id)).first()
     if livre:
         if titre:
             livre.titre = titre
@@ -64,7 +64,7 @@ def update_livre(session: Session, livre_id: int, titre: Optional[str] = None, d
     return livre
 
 def delete_livre(session: Session, livre_id: int) -> bool:
-    livre = session.query(Livre).filter(Livre.id == livre_id).first()
+    livre = session.exec(select(Livre).where(Livre.id == livre_id)).first()
     if livre:
         session.delete(livre)
         session.commit()
@@ -80,13 +80,13 @@ def create_auteur(session: Session, prenom: str, nom: str, biographie: Optional[
     return auteur
 
 def read_auteurs(session: Session) -> List[Auteur]:
-    return session.query(Auteur).all()
+    return session.exec(select(Auteur)).all()
 
 def read_auteur_by_id(session: Session, auteur_id: int) -> Optional[Auteur]:
-    return session.query(Auteur).filter(Auteur.id == auteur_id).first()
+    return session.exec(select(Auteur).where(Auteur.id == auteur_id)).first()
 
 def update_auteur(session: Session, auteur_id: int, prenom: Optional[str] = None, nom: Optional[str] = None, biographie: Optional[str] = None) -> Optional[Auteur]:
-    auteur = session.query(Auteur).filter(Auteur.id == auteur_id).first()
+    auteur = session.exec(select(Auteur).where(Auteur.id == auteur_id)).first()
     if auteur:
         if prenom:
             auteur.prenom = prenom
@@ -99,7 +99,7 @@ def update_auteur(session: Session, auteur_id: int, prenom: Optional[str] = None
     return auteur
 
 def delete_auteur(session: Session, auteur_id: int) -> bool:
-    auteur = session.query(Auteur).filter(Auteur.id == auteur_id).first()
+    auteur = session.exec(select(Auteur).where(Auteur.id == auteur_id)).first()
     if auteur:
         session.delete(auteur)
         session.commit()
@@ -108,14 +108,14 @@ def delete_auteur(session: Session, auteur_id: int) -> bool:
 
 # Fonctions pour gérer la relation many-to-many
 def add_auteur_to_livre(session: Session, livre_id: int, auteur_id: int) -> bool:
-    livre = session.query(Livre).filter(Livre.id == livre_id).first()
-    auteur = session.query(Auteur).filter(Auteur.id == auteur_id).first()
+    livre = session.exec(select(Livre).where(Livre.id == livre_id)).first()
+    auteur = session.exec(select(Auteur).where(Auteur.id == auteur_id)).first()
     if livre and auteur:
         # Vérifier si la relation existe déjà
-        existing = session.query(LivreAuteur).filter(
+        existing = session.exec(select(LivreAuteur).where(
             LivreAuteur.livre_id == livre_id,
             LivreAuteur.auteur_id == auteur_id
-        ).first()
+        )).first()
         if not existing:
             association = LivreAuteur(livre_id=livre_id, auteur_id=auteur_id)
             session.add(association)
@@ -124,10 +124,10 @@ def add_auteur_to_livre(session: Session, livre_id: int, auteur_id: int) -> bool
     return False
 
 def remove_auteur_from_livre(session: Session, livre_id: int, auteur_id: int) -> bool:
-    association = session.query(LivreAuteur).filter(
+    association = session.exec(select(LivreAuteur).where(
         LivreAuteur.livre_id == livre_id,
         LivreAuteur.auteur_id == auteur_id
-    ).first()
+    )).first()
     if association:
         session.delete(association)
         session.commit()
@@ -151,14 +151,21 @@ if __name__ == "__main__":
         # Créer des auteurs
         auteur1 = create_auteur(session, "Victor", "Hugo", "Écrivain français célèbre.")
         auteur2 = create_auteur(session, "Albert", "Camus", "Philosophe et écrivain français.")
+        auteur3 = create_auteur(session, "John", "Doe", "Unknown author.")
+        auteur4 = create_auteur(session, "Jane", "Doe", "Also uknown author.")
 
         # Créer des livres
         livre1 = create_livre(session, "Les Misérables", "Roman historique de Victor Hugo.")
         livre2 = create_livre(session, "L'Étranger", "Roman philosophique d'Albert Camus.")
+        livre3 = create_livre(session, "Book 3", "New book 3.")
+        livre4 = create_livre(session, "Book 4", "New book 4.")
 
         # Associer auteurs aux livres
         add_auteur_to_livre(session, livre1.id, auteur1.id)
+        add_auteur_to_livre(session, livre3.id, auteur1.id)
         add_auteur_to_livre(session, livre2.id, auteur2.id)
+        add_auteur_to_livre(session, livre2.id, auteur3.id)
+        add_auteur_to_livre(session, livre2.id, auteur4.id)
 
         # Lire et afficher
         livres = read_livres(session)
