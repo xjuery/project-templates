@@ -1,0 +1,115 @@
+.filter-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__label {
+    font-size: 0.875rem;
+    color: var(--p-text-muted-color);
+    font-weight: 500;
+  }
+
+  &__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 0.25rem;
+  }
+
+  &__empty-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--p-text-muted-color);
+    font-style: italic;
+  }
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--p-surface-50);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 8px;
+  flex-wrap: wrap;
+
+  &__index {
+    min-width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--p-primary-100);
+    color: var(--p-primary-700);
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+:host ::ng-deep {
+  .filter-select {
+    min-width: 150px;
+
+    &--field {
+      min-width: 160px;
+    }
+
+    &--operator {
+      min-width: 180px;
+    }
+  }
+
+  .filter-datepicker {
+    min-width: 180px;
+  }
+
+  .combinator-select {
+    min-width: 80px;
+  }
+}
+
+.filter-input {
+  min-width: 180px;
+  flex: 1;
+  max-width: 280px;
+}
+
+.filter-boolean {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 100px;
+
+  &__label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--p-text-color);
+  }
+}
+
+.filter-remove-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.add-filter-btn {
+  align-self: flex-start;
+}

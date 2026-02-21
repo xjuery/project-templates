@@ -1,0 +1,149 @@
+<p-toast />
+
+<div class="results-page">
+  <!-- Header -->
+  <div class="results-page__header">
+    <div class="results-page__title-row">
+      <button
+        pButton
+        icon="pi pi-arrow-left"
+        label="Back to Search"
+        class="p-button-text p-button-sm"
+        (click)="backToSearch()"
+      ></button>
+      <div class="results-page__title">
+        <i class="pi pi-table results-page__icon"></i>
+        <div>
+          <h1>Search Results</h1>
+          <p class="results-page__query">{{ queryDescription }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-page__actions">
+      <p-select
+        [options]="pageSizeOptions"
+        [(ngModel)]="pageSize"
+        optionLabel="label"
+        optionValue="value"
+        (ngModelChange)="onPageSizeChange()"
+        styleClass="page-size-select"
+      />
+      <button
+        pButton
+        label="Export CSV"
+        icon="pi pi-download"
+        class="p-button-outlined p-button-success"
+        (click)="exportCSV()"
+        [disabled]="loading || results.length === 0"
+        pTooltip="Export all matching results to CSV"
+        tooltipPosition="left"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <span class="stats-bar__count">
+      <strong>{{ totalRecords }}</strong> result{{ totalRecords !== 1 ? 's' : '' }} found
+    </span>
+    @if (!loading) {
+      <span class="stats-bar__page">
+        Page {{ currentPage }} of {{ Math.ceil(totalRecords / pageSize) || 1 }}
+      </span>
+    }
+  </div>
+
+  <!-- Results Table -->
+  <p-card styleClass="results-card">
+    @if (loading && results.length === 0) {
+      <div class="loading-state">
+        <p-progressSpinner strokeWidth="4" styleClass="loading-spinner" />
+        <span>Loading results...</span>
+      </div>
+    } @else if (!loading && totalRecords === 0) {
+      <div class="empty-state">
+        <i class="pi pi-search empty-state__icon"></i>
+        <h3>No results found</h3>
+        <p>Try adjusting your search query or filters</p>
+        <button
+          pButton
+          label="Modify Search"
+          icon="pi pi-arrow-left"
+          (click)="backToSearch()"
+        ></button>
+      </div>
+    } @else {
+      <p-table
+        [value]="results"
+        [loading]="loading"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalRecords"
+        [sortField]="sortField"
+        [sortOrder]="sortOrder === 'asc' ? 1 : -1"
+        (onLazyLoad)="onLazyLoad($event)"
+        [rowHover]="true"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results"
+        styleClass="p-datatable-striped p-datatable-sm results-table"
+        scrollable="true"
+        scrollHeight="600px"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            @for (field of fields; track field.field) {
+              <th [pSortableColumn]="field.field" style="white-space: nowrap; min-width: 120px">
+                {{ field.label }}
+                <p-sortIcon [field]="field.field" />
+              </th>
+            }
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            @for (field of fields; track field.field) {
+              <td>
+                @if (field.type === 'boolean') {
+                  <p-tag
+                    [value]="row[field.field] ? 'Yes' : 'No'"
+                    [severity]="getBooleanSeverity(row[field.field])"
+                  />
+                } @else if (field.field === 'status') {
+                  <p-tag
+                    [value]="row[field.field]"
+                    [severity]="row[field.field] === 'active' ? 'success' : row[field.field] === 'inactive' ? 'danger' : 'warn'"
+                  />
+                } @else {
+                  <span class="cell-value" [class.cell-value--muted]="!row[field.field]">
+                    {{ formatCellValue(row[field.field], field.type) }}
+                  </span>
+                }
+              </td>
+            }
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td [attr.colspan]="fields.length" class="text-center">
+              No results match your search criteria
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td [attr.colspan]="fields.length">
+              <div class="loading-state loading-state--inline">
+                <p-progressSpinner strokeWidth="4" styleClass="loading-spinner" />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </p-card>
+</div>

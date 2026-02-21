@@ -1,0 +1,101 @@
+<div class="filter-builder">
+  <div class="filter-builder__header" *ngIf="filters.length > 0">
+    <span class="filter-builder__label">Match</span>
+    <p-select
+      [options]="combinatorOptions"
+      [(ngModel)]="combinator"
+      (ngModelChange)="onCombinatorChange($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="combinator-select"
+    />
+    <span class="filter-builder__label">of the following filters:</span>
+  </div>
+
+  <div class="filter-builder__rows">
+    @for (filter of filters; track filter.id; let i = $index) {
+      <div class="filter-row">
+        <span class="filter-row__index">{{ i + 1 }}</span>
+
+        <!-- Field selector -->
+        <p-select
+          [options]="fieldOptions"
+          [ngModel]="filter.field"
+          (ngModelChange)="onFieldChange(filter, $event)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select field"
+          styleClass="filter-select filter-select--field"
+        />
+
+        <!-- Operator selector -->
+        <p-select
+          [options]="getOperatorsForFilter(filter)"
+          [ngModel]="filter.operator"
+          (ngModelChange)="onOperatorChange(filter, $event)"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="filter-select filter-select--operator"
+        />
+
+        <!-- Value input based on field type -->
+        @if (needsValue(filter)) {
+          @if (isBooleanFilter(filter)) {
+            <div class="filter-boolean">
+              <p-toggleswitch
+                [ngModel]="getBooleanValue(filter)"
+                (ngModelChange)="onBooleanChange(filter, $event)"
+              />
+              <span class="filter-boolean__label">{{ getBooleanValue(filter) ? 'True' : 'False' }}</span>
+            </div>
+          } @else if (isDateFilter(filter)) {
+            <p-datepicker
+              [ngModel]="getDateValue(filter)"
+              (ngModelChange)="onDateChange(filter, $event)"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              placeholder="Select date"
+              styleClass="filter-datepicker"
+            />
+          } @else {
+            <input
+              pInputText
+              type="{{ isNumberFilter(filter) ? 'number' : 'text' }}"
+              [ngModel]="filter.value"
+              (ngModelChange)="onValueChange(filter, $event)"
+              placeholder="{{ isNumberFilter(filter) ? 'Enter number...' : 'Enter value...' }}"
+              class="filter-input"
+            />
+          }
+        }
+
+        <button
+          pButton
+          icon="pi pi-times"
+          class="p-button-rounded p-button-text p-button-danger filter-remove-btn"
+          (click)="removeFilter(filter.id)"
+          pTooltip="Remove filter"
+          tooltipPosition="top"
+        ></button>
+      </div>
+    }
+  </div>
+
+  <div class="filter-builder__actions">
+    <button
+      pButton
+      label="Add Filter"
+      icon="pi pi-plus"
+      class="p-button-outlined p-button-sm add-filter-btn"
+      (click)="addFilter()"
+      [disabled]="fields.length === 0"
+    ></button>
+
+    @if (filters.length === 0) {
+      <span class="filter-builder__empty-hint">
+        <i class="pi pi-info-circle"></i>
+        Click "Add Filter" to narrow down your search results
+      </span>
+    }
+  </div>
+</div>
