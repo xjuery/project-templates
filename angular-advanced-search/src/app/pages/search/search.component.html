@@ -1,0 +1,214 @@
+<p-toast />
+
+<div class="search-page">
+
+  <!-- ── Search panel ───────────────────────────────────────────────── -->
+  <p-card styleClass="search-card">
+
+    <!-- Text search bar -->
+    <div class="search-bar">
+      <div class="search-bar__input-wrapper">
+        <i class="pi pi-search search-bar__icon"></i>
+        <input
+          pInputText
+          [(ngModel)]="searchText"
+          placeholder='Search all fields… (e.g. "engineering" or "alice")'
+          class="search-bar__input"
+          (keydown.enter)="search()"
+        />
+        @if (searchText) {
+          <button
+            pButton
+            icon="pi pi-times"
+            class="p-button-text p-button-rounded search-bar__clear"
+            (click)="searchText = ''"
+          ></button>
+        }
+      </div>
+    </div>
+
+    <p-divider />
+
+    <!-- Filter builder -->
+    <div class="filter-section">
+      <div class="filter-section__header">
+        <h3 class="filter-section__title">
+          <i class="pi pi-filter"></i>
+          Filters
+          @if (activeFilterCount > 0) {
+            <span class="filter-badge">{{ activeFilterCount }}</span>
+          }
+        </h3>
+      </div>
+
+      @if (fieldsLoading) {
+        <div class="loading-fields">
+          <p-progressSpinner styleClass="w-6 h-6" strokeWidth="4" />
+          <span>Connecting to mock server…</span>
+        </div>
+      } @else {
+        <app-filter-builder
+          [fields]="fields"
+          [filters]="filters"
+          [combinator]="combinator"
+          (filtersChange)="onFiltersChange($event)"
+          (combinatorChange)="onCombinatorChange($event)"
+        />
+      }
+    </div>
+
+    <!-- Footer actions -->
+    <ng-template pTemplate="footer">
+      <div class="search-actions">
+        <!-- Dirty indicator -->
+        @if (hasSearched && isDirty) {
+          <span class="dirty-hint">
+            <i class="pi pi-exclamation-circle"></i>
+            Filters changed — click Search to update results
+          </span>
+        }
+
+        <div class="search-actions__buttons">
+          <button
+            pButton
+            label="Reset"
+            icon="pi pi-times"
+            class="p-button-outlined p-button-secondary"
+            (click)="reset()"
+            [disabled]="!hasFormInput && !hasSearched"
+          ></button>
+          <button
+            pButton
+            [label]="hasSearched && isDirty ? 'Update Results' : 'Search'"
+            icon="pi pi-search"
+            [loading]="resultsLoading"
+            class="search-btn"
+            [class.p-button-warning]="hasSearched && isDirty"
+            (click)="search()"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+  </p-card>
+
+  <!-- ── Results panel (shown after first search) ───────────────────── -->
+  @if (hasSearched) {
+    <div class="results-section">
+
+      <!-- Stats + actions bar -->
+      <div class="results-bar">
+        <span class="results-bar__count">
+          @if (resultsLoading) {
+            <i class="pi pi-spin pi-spinner"></i>
+          } @else {
+            <strong>{{ totalRecords }}</strong> result{{ totalRecords !== 1 ? 's' : '' }} found
+          }
+        </span>
+
+        <div class="results-bar__actions">
+          <p-select
+            [options]="pageSizeOptions"
+            [(ngModel)]="pageSize"
+            optionLabel="label"
+            optionValue="value"
+            (ngModelChange)="onPageSizeChange()"
+            styleClass="page-size-select"
+          />
+          <button
+            pButton
+            label="Export CSV"
+            icon="pi pi-download"
+            class="p-button-outlined p-button-success p-button-sm"
+            (click)="exportCSV()"
+            [disabled]="resultsLoading || totalRecords === 0"
+            pTooltip="Export all matching results to CSV"
+            tooltipPosition="left"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <p-card styleClass="results-card">
+        @if (!resultsLoading && totalRecords === 0) {
+          <div class="empty-state">
+            <i class="pi pi-search empty-state__icon"></i>
+            <h3>No results found</h3>
+            <p>Try adjusting your search query or filters</p>
+          </div>
+        } @else {
+          <p-table
+            [value]="results"
+            [loading]="resultsLoading"
+            [lazy]="true"
+            [paginator]="true"
+            [rows]="pageSize"
+            [totalRecords]="totalRecords"
+            [sortField]="sortField"
+            [sortOrder]="sortOrder === 'asc' ? 1 : -1"
+            (onLazyLoad)="onLazyLoad($event)"
+            [rowHover]="true"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results"
+            styleClass="p-datatable-striped p-datatable-sm results-table"
+            scrollable="true"
+            scrollHeight="flex"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                @for (field of fields; track field.field) {
+                  <th [pSortableColumn]="field.field" style="white-space: nowrap; min-width: 120px">
+                    {{ field.label }}
+                    <p-sortIcon [field]="field.field" />
+                  </th>
+                }
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                @for (field of fields; track field.field) {
+                  <td>
+                    @if (field.type === 'boolean') {
+                      <p-tag
+                        [value]="row[field.field] ? 'Yes' : 'No'"
+                        [severity]="getBooleanSeverity(row[field.field])"
+                      />
+                    } @else if (field.field === 'status') {
+                      <p-tag
+                        [value]="row[field.field]"
+                        [severity]="row[field.field] === 'active' ? 'success' : row[field.field] === 'inactive' ? 'danger' : 'warn'"
+                      />
+                    } @else {
+                      <span class="cell-value" [class.cell-value--muted]="!row[field.field]">
+                        {{ formatCellValue(row[field.field], field.type) }}
+                      </span>
+                    }
+                  </td>
+                }
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td [attr.colspan]="fields.length" class="text-center p-4">
+                  No results match your search criteria
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        }
+      </p-card>
+    </div>
+  } @else {
+    <!-- Pre-search hint -->
+    <div class="search-tips">
+      <i class="pi pi-lightbulb"></i>
+      <span>
+        <strong>Tips:</strong> Use the text field for a quick search across all fields,
+        or add filters to target specific fields with precise operators.
+        Combine both for powerful queries, then click <strong>Search</strong>.
+      </span>
+    </div>
+  }
+
+</div>

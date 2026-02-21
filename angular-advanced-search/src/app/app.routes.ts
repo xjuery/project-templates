@@ -7,10 +7,5 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/search/search.component').then(m => m.SearchComponent),
   },
-  {
-    path: 'results',
-    loadComponent: () =>
-      import('./pages/results/results.component').then(m => m.ResultsComponent),
-  },
   { path: '**', redirectTo: 'search' },
 ];
