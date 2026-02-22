@@ -1,3 +1,9 @@
+:host {
+  display: block;
+  background: var(--p-surface-50);
+  transition: background 0.2s;
+}
+
 .search-page {
   max-width: 1400px;
   margin: 0 auto;
@@ -38,6 +44,8 @@
     height: 3rem;
     font-size: 1rem;
     border-radius: 8px;
+    background: var(--p-inputtext-background, var(--p-surface-0));
+    color: var(--p-inputtext-color, var(--p-text-color));
     border: 2px solid var(--p-surface-300);
     transition: border-color 0.15s;
 
@@ -148,6 +156,7 @@
   border: 1px solid var(--p-surface-200);
   border-radius: 8px;
   font-size: 0.875rem;
+  transition: background 0.2s, border-color 0.2s;
 
   &__count {
     display: flex;
@@ -245,6 +254,7 @@
   border-radius: 8px;
   font-size: 0.8rem;
   color: var(--p-text-muted-color);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
 
   i {
     color: var(--p-yellow-500);

@@ -6,7 +6,7 @@ import { FieldDefinition, SearchQuery, SearchResponse } from '../models/search.m
 @Injectable({ providedIn: 'root' })
 export class SearchService {
   private http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:3000/api';
+  private readonly API_URL = 'http://localhost:8000/api';
 
   private currentQuerySubject = new BehaviorSubject<SearchQuery | null>(null);
   currentQuery$ = this.currentQuerySubject.asObservable();

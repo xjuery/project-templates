@@ -1,17 +1,23 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
-
-# Node
-/node_modules
+# ── Frontend (Angular / Node) ────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/cache/
+frontend/coverage/
 npm-debug.log
 yarn-error.log
 
-# IDEs and editors
+# ── Backend (Python) ─────────────────────────────────────────────────
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+
+# ── IDEs and editors ─────────────────────────────────────────────────
 .idea/
 .project
 .classpath
@@ -19,8 +25,6 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
-
-# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -28,16 +32,6 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-__screenshots__/
-
-# System files
+# ── System files ─────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db

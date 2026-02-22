@@ -94,7 +94,7 @@ export class SearchComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Connection Error',
-          detail: 'Unable to connect to the mock server. Make sure it is running on port 3000.',
+          detail: 'Unable to connect to the FastAPI backend. Make sure it is running on port 8000.',
           life: 6000,
         });
       },
@@ -187,7 +187,7 @@ export class SearchComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Search Failed',
-          detail: 'Unable to reach the mock server. Please ensure it is running.',
+          detail: 'Unable to reach the FastAPI backend. Please ensure it is running on port 8000.',
           life: 5000,
         });
       },

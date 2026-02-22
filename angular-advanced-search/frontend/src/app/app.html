@@ -1,0 +1,17 @@
+<nav class="app-nav">
+  <div class="app-nav__brand">
+    <i class="pi pi-search"></i>
+    <span>Advanced Search</span>
+  </div>
+  <button
+    class="theme-toggle"
+    [title]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+    (click)="themeService.toggle()"
+  >
+    <i [class]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+  </button>
+</nav>
+
+<main class="app-main">
+  <router-outlet />
+</main>
