@@ -1,0 +1,70 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  .field-wrapper {
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.field-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--p-text-color);
+}
+
+.required-marker {
+  color: var(--p-red-500);
+  margin-left: 0.25rem;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+
+  .checkbox-label {
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+}
+
+.field-hint {
+  color: var(--p-text-muted-color);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.field-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+.w-full {
+  width: 100%;
+}

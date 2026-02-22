@@ -1,0 +1,163 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="form-grid">
+    @for (field of config().fields; track field.name) {
+      <div class="field-wrapper" [class.full-width]="field.type === 'textarea'">
+        <div class="field">
+
+          <!-- Label -->
+          <label [for]="field.name" class="field-label">
+            {{ field.label }}
+            @if (field.required) {
+              <span class="required-marker">*</span>
+            }
+          </label>
+
+          <!-- TEXT input -->
+          @if (field.type === 'text') {
+            <input
+              pInputText
+              [id]="field.name"
+              [formControlName]="field.name"
+              [placeholder]="field.placeholder || ''"
+              [class.ng-invalid]="isInvalid(field)"
+              [class.ng-dirty]="isInvalid(field)"
+              class="w-full"
+            />
+          }
+
+          <!-- EMAIL input -->
+          @if (field.type === 'email') {
+            <input
+              pInputText
+              type="email"
+              [id]="field.name"
+              [formControlName]="field.name"
+              [placeholder]="field.placeholder || ''"
+              [class.ng-invalid]="isInvalid(field)"
+              [class.ng-dirty]="isInvalid(field)"
+              class="w-full"
+            />
+          }
+
+          <!-- NUMBER input -->
+          @if (field.type === 'number') {
+            <p-inputnumber
+              [inputId]="field.name"
+              [formControlName]="field.name"
+              [placeholder]="field.placeholder || ''"
+              [min]="field.min ?? undefined"
+              [max]="field.max ?? undefined"
+              [showButtons]="false"
+              class="w-full"
+              [inputStyleClass]="isInvalid(field) ? 'ng-invalid ng-dirty w-full' : 'w-full'"
+            />
+          }
+
+          <!-- DATE input -->
+          @if (field.type === 'date') {
+            <p-datepicker
+              [inputId]="field.name"
+              [formControlName]="field.name"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              class="w-full"
+              [inputStyleClass]="isInvalid(field) ? 'ng-invalid ng-dirty w-full' : 'w-full'"
+            />
+          }
+
+          <!-- BOOLEAN input -->
+          @if (field.type === 'boolean') {
+            <div class="checkbox-wrapper">
+              <p-checkbox
+                [inputId]="field.name"
+                [formControlName]="field.name"
+                [binary]="true"
+              />
+              <label [for]="field.name" class="checkbox-label">{{ field.label }}</label>
+            </div>
+          }
+
+          <!-- SELECT input -->
+          @if (field.type === 'select') {
+            <p-select
+              [inputId]="field.name"
+              [formControlName]="field.name"
+              [options]="field.options || []"
+              optionLabel="label"
+              optionValue="value"
+              [placeholder]="'Select ' + field.label"
+              class="w-full"
+              [styleClass]="isInvalid(field) ? 'ng-invalid ng-dirty w-full' : 'w-full'"
+            />
+          }
+
+          <!-- TEXTAREA input -->
+          @if (field.type === 'textarea') {
+            <textarea
+              pTextarea
+              [id]="field.name"
+              [formControlName]="field.name"
+              [placeholder]="field.placeholder || ''"
+              rows="4"
+              [class.ng-invalid]="isInvalid(field)"
+              [class.ng-dirty]="isInvalid(field)"
+              class="w-full"
+            ></textarea>
+          }
+
+          <!-- Hint text -->
+          @if (field.hint && field.type !== 'boolean') {
+            <small class="field-hint">{{ field.hint }}</small>
+          }
+
+          <!-- Validation errors -->
+          @if (isInvalid(field)) {
+            <div class="field-errors">
+              @if (getError(field.name, 'required')) {
+                <p-message severity="error" size="small" [text]="field.label + ' is required'" />
+              }
+              @if (getError(field.name, 'email')) {
+                <p-message severity="error" size="small" text="Please enter a valid email address" />
+              }
+              @if (getError(field.name, 'minlength')) {
+                <p-message severity="error" size="small" [text]="'Minimum length is ' + field.minLength + ' characters'" />
+              }
+              @if (getError(field.name, 'maxlength')) {
+                <p-message severity="error" size="small" [text]="'Maximum length is ' + field.maxLength + ' characters'" />
+              }
+              @if (getError(field.name, 'min')) {
+                <p-message severity="error" size="small" [text]="'Minimum value is ' + field.min" />
+              }
+              @if (getError(field.name, 'max')) {
+                <p-message severity="error" size="small" [text]="'Maximum value is ' + field.max" />
+              }
+              @if (getError(field.name, 'pattern')) {
+                <p-message severity="error" size="small" text="Invalid format" />
+              }
+            </div>
+          }
+
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Form actions -->
+  <div class="form-actions">
+    <p-button
+      type="button"
+      label="Reset"
+      severity="secondary"
+      [outlined]="true"
+      icon="pi pi-refresh"
+      (onClick)="onReset()"
+      [disabled]="loading()"
+    />
+    <p-button
+      type="submit"
+      label="Create"
+      icon="pi pi-check"
+      [loading]="loading()"
+    />
+  </div>
+</form>

@@ -1,0 +1,117 @@
+<p-toast position="top-right" />
+<p-confirmdialog />
+
+<div class="page-container">
+  <!-- Page header -->
+  <div class="page-header">
+    <h1 class="page-title">
+      @if (config()) {
+        {{ config()!.displayName }} List
+      } @else {
+        Object List
+      }
+    </h1>
+    <div class="header-actions">
+      <p-button
+        label="Refresh"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="refresh()"
+        [loading]="loading()"
+      />
+      <p-button
+        label="Create New"
+        icon="pi pi-plus"
+        [routerLink]="['/objects', objectType(), 'create']"
+      />
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="loading-container">
+      <p-progressspinner strokeWidth="4" />
+      <p>Loading data...</p>
+    </div>
+  }
+
+  <!-- Data table -->
+  @if (!loading()) {
+    <p-card>
+      <p-table
+        [value]="objects()"
+        [paginator]="objects().length > 10"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [globalFilterFields]="filterableFieldNames()"
+        class="p-datatable-sm"
+        [sortMode]="'multiple'"
+        [scrollable]="true"
+      >
+        <ng-template #header>
+          <tr>
+            @for (col of columns(); track col.name) {
+              @if (col.type !== 'textarea') {
+                <th [pSortableColumn]="col.name" style="white-space: nowrap">
+                  {{ col.label }}
+                  <p-sortIcon [field]="col.name" />
+                </th>
+              }
+            }
+            <th style="width: 100px">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-item>
+          <tr>
+            @for (col of columns(); track col.name) {
+              @if (col.type !== 'textarea') {
+                <td>
+                  @if (isBoolean(col)) {
+                    <p-tag
+                      [value]="item[col.name] ? 'Yes' : 'No'"
+                      [severity]="item[col.name] ? 'success' : 'danger'"
+                    />
+                  } @else if (isDate(col)) {
+                    {{ item[col.name] ? (item[col.name] | date: 'dd/MM/yyyy') : '—' }}
+                  } @else {
+                    {{ formatValue(item[col.name], col) }}
+                  }
+                </td>
+              }
+            }
+            <td>
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="confirmDelete(item)"
+                pTooltip="Delete"
+              />
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template #empty>
+          <tr>
+            <td [attr.colspan]="columns().length + 1" class="empty-state">
+              <div class="empty-content">
+                <i class="pi pi-inbox"></i>
+                <p>No {{ config()?.displayName ?? 'items' }} found</p>
+                <p-button
+                  label="Create the first one"
+                  icon="pi pi-plus"
+                  [routerLink]="['/objects', objectType(), 'create']"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  }
+</div>

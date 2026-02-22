@@ -1,0 +1,43 @@
+<div class="app-layout">
+
+  <!-- Sidebar navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="pi pi-database sidebar-logo"></i>
+      <span class="sidebar-title">Object Manager</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (type of objectTypes; track type.id) {
+        <div class="nav-section">
+          <span class="nav-section-title">
+            <i class="pi {{ type.icon }}"></i>
+            {{ type.label }}
+          </span>
+          <a
+            class="nav-item"
+            [routerLink]="['/objects', type.id, 'create']"
+            routerLinkActive="active"
+          >
+            <i class="pi pi-plus-circle"></i>
+            Create
+          </a>
+          <a
+            class="nav-item"
+            [routerLink]="['/objects', type.id, 'list']"
+            routerLinkActive="active"
+          >
+            <i class="pi pi-list"></i>
+            List
+          </a>
+        </div>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <router-outlet />
+  </main>
+
+</div>

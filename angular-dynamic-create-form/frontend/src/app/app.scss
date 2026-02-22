@@ -1,0 +1,114 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--p-surface-100);
+  border-right: 1px solid var(--p-surface-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--p-surface-border);
+
+  .sidebar-logo {
+    font-size: 1.5rem;
+    color: var(--p-primary-color);
+  }
+
+  .sidebar-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--p-text-color);
+    white-space: nowrap;
+  }
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 0;
+  gap: 0.25rem;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--p-surface-border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.nav-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--p-text-muted-color);
+
+  .pi {
+    font-size: 0.85rem;
+  }
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  text-decoration: none;
+  color: var(--p-text-color);
+  font-size: 0.875rem;
+  border-radius: 0;
+  transition: background 0.15s, color 0.15s;
+
+  .pi {
+    font-size: 0.875rem;
+    width: 1rem;
+    text-align: center;
+  }
+
+  &:hover {
+    background: var(--p-surface-200);
+    color: var(--p-primary-color);
+  }
+
+  &.active {
+    background: var(--p-primary-50);
+    color: var(--p-primary-color);
+    font-weight: 600;
+    border-left: 3px solid var(--p-primary-color);
+    padding-left: calc(2rem - 3px);
+  }
+}
+
+/* ── Main content ────────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  margin-left: 220px;
+  min-height: 100vh;
+  background: var(--p-surface-0);
+}

@@ -1,0 +1,16 @@
+{
+  "persons": [
+    {
+      "firstName": "aa",
+      "lastName": "bb",
+      "email": "cc@c.f",
+      "birthDate": "2026-02-21T23:00:00.000Z",
+      "age": 1,
+      "role": "admin",
+      "bio": null,
+      "isActive": true,
+      "id": 1
+    }
+  ],
+  "products": []
+}

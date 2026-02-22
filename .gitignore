@@ -5,3 +5,5 @@ package-lock.json
 *.db
 *.zip
 my-prompts.txt
+.editorconfig
+node_modules

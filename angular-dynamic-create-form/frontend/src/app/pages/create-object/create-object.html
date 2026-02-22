@@ -1,0 +1,39 @@
+<p-toast position="top-right" />
+
+<div class="page-container">
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a [routerLink]="['/objects', objectType(), 'list']" class="back-link">
+        <i class="pi pi-arrow-left"></i>
+        <span>Back to list</span>
+      </a>
+      <h1 class="page-title">
+        @if (config()) {
+          Create {{ config()!.displayName }}
+        } @else {
+          Create Object
+        }
+      </h1>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (configLoading()) {
+    <div class="loading-container">
+      <p-progressspinner strokeWidth="4" />
+      <p>Loading form configuration...</p>
+    </div>
+  }
+
+  <!-- Form card -->
+  @if (!configLoading() && config()) {
+    <p-card>
+      <app-dynamic-form
+        [config]="config()!"
+        [loading]="loading()"
+        (submitted)="onFormSubmit($event)"
+      />
+    </p-card>
+  }
+</div>

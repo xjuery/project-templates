@@ -1,0 +1,74 @@
+{
+  "objectType": "product",
+  "displayName": "Product",
+  "apiEndpoint": "/api/products",
+  "fields": [
+    {
+      "name": "name",
+      "label": "Product Name",
+      "type": "text",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 100,
+      "placeholder": "Enter product name"
+    },
+    {
+      "name": "sku",
+      "label": "SKU",
+      "type": "text",
+      "required": true,
+      "pattern": "^[A-Z0-9-]+$",
+      "placeholder": "e.g. PROD-001",
+      "hint": "Only uppercase letters, numbers and hyphens"
+    },
+    {
+      "name": "description",
+      "label": "Description",
+      "type": "textarea",
+      "required": false,
+      "maxLength": 1000,
+      "placeholder": "Product description..."
+    },
+    {
+      "name": "price",
+      "label": "Price (€)",
+      "type": "number",
+      "required": true,
+      "min": 0,
+      "placeholder": "0.00"
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "type": "number",
+      "required": true,
+      "min": 0,
+      "placeholder": "0"
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "type": "select",
+      "required": true,
+      "options": [
+        { "label": "Electronics", "value": "electronics" },
+        { "label": "Clothing", "value": "clothing" },
+        { "label": "Food & Beverages", "value": "food" },
+        { "label": "Books", "value": "books" },
+        { "label": "Other", "value": "other" }
+      ]
+    },
+    {
+      "name": "releaseDate",
+      "label": "Release Date",
+      "type": "date",
+      "required": false
+    },
+    {
+      "name": "inStock",
+      "label": "In Stock",
+      "type": "boolean",
+      "default": true
+    }
+  ]
+}
