@@ -5,6 +5,7 @@
 
 FRONTEND_DIR  := frontend
 MOCK_DIR      := mockserver
+BACKEND_DIR   := backend
 
 # Colours for terminal output
 RESET  := \033[0m
@@ -22,11 +23,13 @@ help: ## Show this help message
 		{printf "  $(CYAN)%-22s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@printf "\n$(BOLD)URLs:$(RESET)\n"
 	@printf "  Frontend   → $(GREEN)http://localhost:4200$(RESET)\n"
+	@printf "  Backend    → $(GREEN)http://localhost:8000$(RESET)\n"
+	@printf "  API docs   → $(GREEN)http://localhost:8000/docs$(RESET)\n"
 	@printf "  Mock API   → $(GREEN)http://localhost:3001$(RESET)\n\n"
 
 # ── Installation ─────────────────────────────────────────────
 .PHONY: install
-install: install-frontend install-mock ## Install all dependencies
+install: install-frontend install-mock install-backend ## Install all dependencies
 
 .PHONY: install-frontend
 install-frontend: ## Install Angular frontend dependencies
@@ -40,18 +43,41 @@ install-mock: ## Install mock server dependencies
 	@cd $(MOCK_DIR) && npm install
 	@printf "$(GREEN)✔ Mock server dependencies installed$(RESET)\n"
 
+.PHONY: install-backend
+install-backend: ## Create Python venv and install FastAPI backend dependencies
+	@printf "$(YELLOW)▶ Installing backend dependencies...$(RESET)\n"
+	@cd $(BACKEND_DIR) && python3 -m venv .venv && .venv/bin/pip install --upgrade pip --quiet && .venv/bin/pip install -r requirements.txt --quiet
+	@printf "$(GREEN)✔ Backend dependencies installed$(RESET)\n"
+
 # ── Development ──────────────────────────────────────────────
 .PHONY: dev
-dev: ## Start both servers in parallel (requires make 4.x with -j)
+dev: ## Start frontend + backend in parallel (requires make 4.x with -j)
 	@printf "$(YELLOW)▶ Starting development environment...$(RESET)\n"
 	@printf "  Frontend → $(GREEN)http://localhost:4200$(RESET)\n"
+	@printf "  Backend  → $(GREEN)http://localhost:8000$(RESET)\n\n"
+	@$(MAKE) -j2 start-frontend start-backend
+
+.PHONY: dev-mock
+dev-mock: ## Start frontend + mock server in parallel (legacy)
+	@printf "$(YELLOW)▶ Starting development environment (mock server)...$(RESET)\n"
+	@printf "  Frontend → $(GREEN)http://localhost:4200$(RESET)\n"
 	@printf "  Mock API → $(GREEN)http://localhost:3001$(RESET)\n\n"
-	@$(MAKE) -j2 start-frontend start-mock
+	@$(MAKE) -j2 start-frontend-mock start-mock
 
 .PHONY: start-frontend
-start-frontend: ## Start the Angular dev server (http://localhost:4200)
-	@printf "$(YELLOW)▶ Starting Angular frontend...$(RESET)\n"
+start-frontend: ## Start the Angular dev server proxied to FastAPI backend (http://localhost:4200)
+	@printf "$(YELLOW)▶ Starting Angular frontend (→ FastAPI backend)...$(RESET)\n"
+	@cd $(FRONTEND_DIR) && npm start -- --proxy-config proxy.conf.backend.json
+
+.PHONY: start-frontend-mock
+start-frontend-mock: ## Start the Angular dev server proxied to the mock server (http://localhost:4200)
+	@printf "$(YELLOW)▶ Starting Angular frontend (→ mock server)...$(RESET)\n"
 	@cd $(FRONTEND_DIR) && npm start
+
+.PHONY: start-backend
+start-backend: ## Start the FastAPI backend (http://localhost:8000)
+	@printf "$(YELLOW)▶ Starting FastAPI backend...$(RESET)\n"
+	@cd $(BACKEND_DIR) && .venv/bin/uvicorn main:app --reload --port 8000
 
 .PHONY: start-mock
 start-mock: ## Start the json-server mock API (http://localhost:3001)
@@ -91,7 +117,7 @@ clean: ## Remove build artefacts
 	@printf "$(GREEN)✔ Clean complete$(RESET)\n"
 
 .PHONY: clean-all
-clean-all: ## Remove build artefacts AND node_modules (full reset)
-	@printf "$(YELLOW)▶ Removing artefacts and node_modules...$(RESET)\n"
-	@rm -rf $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/node_modules $(MOCK_DIR)/node_modules
+clean-all: ## Remove build artefacts, node_modules and backend venv (full reset)
+	@printf "$(YELLOW)▶ Removing artefacts and dependencies...$(RESET)\n"
+	@rm -rf $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/node_modules $(MOCK_DIR)/node_modules $(BACKEND_DIR)/.venv
 	@printf "$(GREEN)✔ Full clean complete — run 'make install' to reinstall$(RESET)\n"
