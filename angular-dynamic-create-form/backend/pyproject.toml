@@ -1,12 +1,14 @@
 [project]
 name = "dynamic-create-form-backend"
-version = "1.0.0"
+version = "2.0.0"
 description = "FastAPI backend for the Angular Dynamic Create Form application"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.30.0",
     "pydantic[email]>=2.7.0",
+    "sqlmodel>=0.0.21",
+    "sqlalchemy>=2.0.0",
 ]
 
 [project.optional-dependencies]

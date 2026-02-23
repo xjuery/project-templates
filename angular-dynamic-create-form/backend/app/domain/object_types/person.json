@@ -1,0 +1,82 @@
+{
+  "objectType": "person",
+  "displayName": "Person",
+  "apiEndpoint": "/api/persons",
+  "fields": [
+    {
+      "name": "firstName",
+      "label": "First Name",
+      "type": "text",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 50,
+      "placeholder": "Enter first name"
+    },
+    {
+      "name": "lastName",
+      "label": "Last Name",
+      "type": "text",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 50,
+      "placeholder": "Enter last name"
+    },
+    {
+      "name": "nickname",
+      "label": "Nickname",
+      "type": "text",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 50,
+      "placeholder": "Enter nickname"
+    },
+    {
+      "name": "email",
+      "label": "Email",
+      "type": "email",
+      "required": true,
+      "placeholder": "Enter email address"
+    },
+    {
+      "name": "birthDate",
+      "label": "Birth Date",
+      "type": "date",
+      "required": false
+    },
+    {
+      "name": "age",
+      "label": "Age",
+      "type": "number",
+      "required": false,
+      "min": 0,
+      "max": 150,
+      "placeholder": "Enter age"
+    },
+    {
+      "name": "role",
+      "label": "Role",
+      "type": "select",
+      "required": true,
+      "options": [
+        { "label": "Admin", "value": "admin" },
+        { "label": "User", "value": "user" },
+        { "label": "Manager", "value": "manager" },
+        { "label": "Guest", "value": "guest" }
+      ]
+    },
+    {
+      "name": "bio",
+      "label": "Biography",
+      "type": "textarea",
+      "required": false,
+      "maxLength": 500,
+      "placeholder": "Brief biography..."
+    },
+    {
+      "name": "isActive",
+      "label": "Active",
+      "type": "boolean",
+      "default": true
+    }
+  ]
+}
