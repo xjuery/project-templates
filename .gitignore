@@ -7,3 +7,4 @@ package-lock.json
 my-prompts.txt
 .editorconfig
 node_modules
+*.pyc
